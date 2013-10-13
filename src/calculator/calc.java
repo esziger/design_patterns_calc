@@ -2,6 +2,7 @@ package calculator;
 
 import java.awt.EventQueue;
 
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -11,27 +12,19 @@ import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.Stack;
 
 /**
  * The calculator works with RPN/Peverse polish notation
  * This means the calculator accepts commands in POSTFIX notation e.g.: 5,4 +  OR e.g: 67 90 * 15 +
  * Because of the postfix notation We don't need parenthesis
  */
-public class calc extends JFrame implements ActionListener, KeyListener {
+public class calc extends JFrame implements ActionListener {
 
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField textField;
 	private JLabel label;
 	private JButton button_0;	//evaluate
-	private String result="";
-	
-	public LogicAdapter logicAdapter; //logicAdapter
-	
-	Stack<String> my_stack =new Stack<String>();
-	
 	private JButton button_1;
 	private JButton button_2;
 	private JButton button_3;
@@ -48,23 +41,21 @@ public class calc extends JFrame implements ActionListener, KeyListener {
 	private JButton button_14;
 	private JButton button_15;
 	private JButton button_16;
+	private JButton button_17;
+	private JButton button_18;
+	
+	private String result="";
 	
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		final LogicAdapter pol = new LogicAdapter();
-		
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					calc frame = new calc(pol);
-					frame.setVisible(true);
-					
-					//Testing the evaluation function
-					System.out.println("Test result is: "+frame.evaluate("5 1 2 + 4 * + 3 -"));
-					
+					calc frame = new calc();
+					frame.setVisible(true);				
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -75,8 +66,7 @@ public class calc extends JFrame implements ActionListener, KeyListener {
 	/**
 	 * Create the frame.
 	 */
-	public calc(LogicAdapter adapter) {
-		logicAdapter=adapter;
+	public calc() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 298, 300);
 		contentPane = new JPanel();
@@ -160,6 +150,14 @@ public class calc extends JFrame implements ActionListener, KeyListener {
 		button_16 = new JButton(",");
 		button_16.setBounds(10, 170, 50, 20);
 		contentPane.add(button_16);
+		
+		button_17 = new JButton("^");
+		button_17.setBounds(133, 200, 50, 20);
+		contentPane.add(button_17);
+		
+		button_18 = new JButton("1/^");
+		button_18.setBounds(200, 200, 60, 20);
+		contentPane.add(button_18);
 
 	    // add event listeners
 	    button_0.addActionListener( this );
@@ -179,81 +177,34 @@ public class calc extends JFrame implements ActionListener, KeyListener {
 	    button_14.addActionListener( this );
 	    button_15.addActionListener( this );
 	    button_16.addActionListener( this );
+	    button_17.addActionListener( this );
+	    button_18.addActionListener( this );
 	}
 
-	@Override
-	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
-	//evaluates the input text
-	public String evaluate(String input){
-			
-			if(input.equals(""))
-				result=this.textField.getText();
-			else
-				result=input;
-			
-		 	//replace all whitespace to ,
-		 	result=result.replaceAll("\\s+", ",");
-		 	
-		 	String[] parsed_input = result.split("(\\s|,)");
-		 	
-		 	for(String item : parsed_input){
-	               System.out.println(item);
-	        }
-		 	
-		 	for(int i = 0; i < parsed_input.length; ++i)
-		 	{
-		 		switch(parsed_input[i])
-		 		{
-		 			case "+" :
-		 				my_stack.push(logicAdapter.add(my_stack.pop(), my_stack.pop()));
-		 				break;
-		 			case "-":
-		 				my_stack.push(logicAdapter.substract(my_stack.pop(), my_stack.pop()));
-		 				break;
-		 			case "*":
-		 				my_stack.push(logicAdapter.multiply(my_stack.pop(), my_stack.pop()));
-		 				break;
-		 			case "\\":
-		 				my_stack.push(logicAdapter.divide(my_stack.pop(), my_stack.pop()));
-		 				break;
-		 			default:
-		 				my_stack.push(parsed_input[i]);
-		 		
-		 		}
-		 	}
-		 	
-			return my_stack.pop();
-	}
-	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 	
 	 //if press evaluate or =
 	 if(e.getSource().equals(button_0) || e.getSource().equals(button_15)){
 		 
-		 result=evaluate("");
+	     result=this.textField.getText();
+    	 result=result.replaceAll("\\s+", ",");			   	//replace all whitespace to ,
+    	 
+    	 //self check
+		 String[] parsed_input = result.split("(\\s|,)");
+		 for(String item : parsed_input){
+             System.out.println(item);
+		 }
+		 
+		 IExpressionBuilder builder = new ConcreteBuilder(); //Builder Pattern
+		 Director dir = new Director(builder);
+		 IExpression expression=dir.evaluate(result);		 // e.g.: IExpression expression=dir.evaluate("5 5 + 3 -");
+
+	     result=Integer.toString(expression.Interpret());    // e.g.: (10 - 2) + 3 = 11
 		 label.setText(result);
 		 
-		 result=" ";
-		 this.textField.setText(result);
-		 System.out.println("asdasd");
+		 result="";
+		 System.out.println("Result: "+result);
 		}
 	 else if(e.getSource().equals(button_1)){
 		 	result=this.textField.getText()+"1";
@@ -290,13 +241,19 @@ public class calc extends JFrame implements ActionListener, KeyListener {
 		}
 	else if(e.getSource().equals(button_13)){
 			result=this.textField.getText()+" * ";
-	}
+		}
 	else if(e.getSource().equals(button_14)){
 			result=this.textField.getText()+" \\ ";
-	}
+		}
 	else if(e.getSource().equals(button_16)){
 			result=this.textField.getText()+",";
-	}
+		}
+	else if(e.getSource().equals(button_17)){
+			result=this.textField.getText()+" ^ ";
+		}
+	else if(e.getSource().equals(button_18)){
+			result=this.textField.getText()+" 1/^";	//root operation
+		}
 	 
 	this.textField.setText(result);	
 	}
