@@ -5,17 +5,19 @@ import java.util.Map;
 
 public class NodeFactory {
 	
-	 private Map<String, ConcreteNode> node = new HashMap<String, ConcreteNode>();
+	 private Map<IExpression, ConcreteNode> node = new HashMap<IExpression, ConcreteNode>();
 	 
-	 public ConcreteNode getNode(){
+	 public ConcreteNode getNode(IExpression exp){
+		 ConcreteNode cNode=node.get(exp);
+		 if(cNode==null){
+			    cNode = new ConcreteNode(exp);
+	            node.put(exp, cNode);
+		 }
 		
-		 
-		 return null;
+		 return cNode;
 	 }
-	 
-	 
+	
 	 public int getSize(){
 		 return node.size();
-	 }
-	 
+	 }	 
 }
