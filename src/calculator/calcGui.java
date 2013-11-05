@@ -7,12 +7,10 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTextField;
 import javax.swing.JButton;
-
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.util.Stack;
-
 
 /**
  * The calculator works with RPN/Peverse polish notation
@@ -44,11 +42,16 @@ public class calcGui extends JFrame implements ActionListener{
 	private JButton button_16;
 	private JButton button_17;
 	private JButton button_18;
+	private JButton button_19;
+	private JButton button_20;
 
 	private String result="";
-
+	
 	Stack<JLabel> labelStack = new Stack<JLabel>();	//helper stack for removing labels
-
+		
+	private MementoCareTaker mCareTaker = new MementoCareTaker();
+	private RedoUndoActor actor = new RedoUndoActor(mCareTaker);
+	
 	/**
 	 * Launch the application.
 	 */
@@ -76,9 +79,7 @@ public class calcGui extends JFrame implements ActionListener{
 		contentPane.setForeground(new Color(0, 0, 0));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		//contentPane.setLayout(new BorderLayout(0, 0));
 		contentPane.setLayout(null);
-		//contentPane.setLayout(new GridLayout(5, 2));
 
 		textField = new JTextField();
 		textField.setBounds(10, 11, 173, 20);
@@ -164,6 +165,14 @@ public class calcGui extends JFrame implements ActionListener{
 		button_18 = new JButton("1/^");
 		button_18.setBounds(200, 200, 60, 20);
 		contentPane.add(button_18);
+		
+		button_19 = new JButton("Undo");
+		button_19.setBounds(10, 200, 110, 20);
+		contentPane.add(button_19);
+
+		button_20 = new JButton("Redo");
+		button_20.setBounds(10, 230, 110, 20);
+		contentPane.add(button_20);
 
 		// add event listeners
 		button_0.addActionListener( this );
@@ -185,8 +194,42 @@ public class calcGui extends JFrame implements ActionListener{
 		button_16.addActionListener( this );
 		button_17.addActionListener( this );
 		button_18.addActionListener( this );
+		button_19.addActionListener( this );
+		button_20.addActionListener( this );
 	}
 
+	public void buildExpressionAndTree(){
+		IExpressionBuilder builder = new ConcreteBuilder();		 //Builder Pattern
+		Director dir = new Director(builder);
+
+		Stack<ConcreteNode> cNode = new Stack<ConcreteNode>();
+
+		IExpression expression=dir.evaluate(result,cNode);		 // e.g.: IExpression expression=dir.evaluate("5 5 + 3 -");
+
+		result=Integer.toString(expression.Interpret());   		 // e.g.: (10 - 2) + 3 = 11
+		label.setText(result);
+
+		if(labelStack.size()!=0){								 //erase the previous graph labels
+			for(JLabel labels: labelStack){
+				contentPane.remove(labels);
+			}
+		}
+
+		//Build tree graph
+		ImageContext image =new ImageContext();
+
+		for(ConcreteNode cnode: cNode){
+			JLabel label=cnode.drawNode(image);
+			contentPane.add(label);
+			labelStack.push(label);
+		}
+		ConcreteNode.reSetXY();
+		repaint();
+		
+		result="";
+		System.out.println("Result: "+result);	
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
@@ -202,37 +245,10 @@ public class calcGui extends JFrame implements ActionListener{
 				System.out.println(item);
 			}
 
-			IExpressionBuilder builder = new ConcreteBuilder(); //Builder Pattern
-			Director dir = new Director(builder);
-
-			//NodeFactory nodeF=new NodeFactory();
-			Stack<ConcreteNode> cNode = new Stack<ConcreteNode>();
-
-			IExpression expression=dir.evaluate(result,cNode);		 // e.g.: IExpression expression=dir.evaluate("5 5 + 3 -");
-
-			result=Integer.toString(expression.Interpret());   	 // e.g.: (10 - 2) + 3 = 11
-			label.setText(result);
-
-			if(labelStack.size()!=0){								 //erase the previous graph labels
-				for(JLabel labels: labelStack){
-					contentPane.remove(labels);
-				}
-			}
-
-			//Build tree graph
-			ImageContext image =new ImageContext();
-
-			for(ConcreteNode cnode: cNode){
-				JLabel label=cnode.drawNode(image);
-				contentPane.add(label);
-				labelStack.push(label);
-			}
-			ConcreteNode.reSetXY();
-			repaint();
-			//
-
-			result="";
-			System.out.println("Result: "+result);
+			//save state
+			mCareTaker.saveState(result);
+			
+			buildExpressionAndTree();
 		}
 		else if(e.getSource().equals(button_1)){
 			result=this.textField.getText()+"1";
@@ -284,6 +300,32 @@ public class calcGui extends JFrame implements ActionListener{
 		}
 		else if(e.getSource().equals(button_18)){
 			result=this.textField.getText()+" 1/^";	//root operation
+		}
+		else if(e.getSource().equals(button_19)){	
+			Invoker invoke = new Invoker();
+			Command undoCommand = new UndoCommand(actor);	//undo
+			invoke.SetCommand(undoCommand);
+			invoke.execute();
+			
+			//restore the state to the previous one
+			String s= actor.getState();
+			if (s!=null){
+				result = s;
+				buildExpressionAndTree();
+			}
+		}
+		else if(e.getSource().equals(button_20)){	
+			//restore the state to the next one	
+			Invoker invoke = new Invoker();
+			Command redoCommand = new RedoCommand(actor);	//redo
+			invoke.SetCommand(redoCommand);
+			invoke.execute();
+			
+			String s= actor.getState();
+			if (s!=null){
+				result = s;
+				buildExpressionAndTree();
+			}
 		}
 
 		this.textField.setText(result);	

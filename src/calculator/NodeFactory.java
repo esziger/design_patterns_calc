@@ -3,6 +3,7 @@ package calculator;
 import java.util.HashMap;
 import java.util.Map;
 
+//FlyweightFactory
 public class NodeFactory {
 	
 	 private Map<IExpression, ConcreteNode> node = new HashMap<IExpression, ConcreteNode>();
