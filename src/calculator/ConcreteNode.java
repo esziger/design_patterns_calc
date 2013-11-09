@@ -1,10 +1,10 @@
 package calculator;
 
 import java.awt.Color;
-
 import javax.swing.JLabel;
 
-public class ConcreteNode implements INode {
+
+public class ConcreteNode implements INode, Cloneable {
 
 	private int value;
 	private String operator=null;
@@ -13,32 +13,19 @@ public class ConcreteNode implements INode {
 	public static int x=250;
 	public static int y=250;
 	
-	public ConcreteNode(IExpression exp){
-		
-		value=exp.Interpret();
-		
-		if(exp.getClass()==NumberExpression.class){
-			isNumber=true;
-		}
-		else if(exp.getClass()==MultiplyExpression.class){
-			operator="*";
-		}
-		else if(exp.getClass()==DivideExpression.class){
-			operator="\\";
-		}
-		else if(exp.getClass()==SqrtExpression.class){
-			operator="1/^";
-		}
-		else if(exp.getClass()==PowerExpression.class){
-			operator="^";
-		}
-		else if(exp.getClass()==AddExpression.class){
-			operator="+";
-		}
-		else if(exp.getClass()==SubtractExpression.class){
-			operator="-";
-		}
-	}
+	public ConcreteNode(){}
+	
+	 public ConcreteNode clone()
+	 {
+	   ConcreteNode clonedItem = null;
+	   try {  
+	          //use default object clone.
+	          clonedItem = (ConcreteNode) super.clone(); 
+	    } catch (CloneNotSupportedException e) {
+	        e.printStackTrace();   
+	     } // catch 
+	  return clonedItem ;
+	 }
 	
 	@Override
 	public JLabel drawNode(ImageContext image) {
@@ -69,4 +56,19 @@ public class ConcreteNode implements INode {
 		y=250;
 	}
 
+	public void setvalue(int interpretValue) {
+		value=interpretValue;
+	}
+	
+	public void setOperator(String op){
+		operator=op;
+	}
+	
+	public String getOperator(){
+		return operator;
+	}
+	
+	public void setNum(){
+		isNumber=true;
+	}
 }

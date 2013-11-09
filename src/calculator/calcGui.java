@@ -23,6 +23,8 @@ public class calcGui extends JFrame implements ActionListener{
 	private JPanel contentPane;
 	private JTextField textField;
 	private JLabel label;
+	private JLabel statLabel;
+	
 	private JButton button_0;	//evaluate
 	private JButton button_1;
 	private JButton button_2;
@@ -74,7 +76,7 @@ public class calcGui extends JFrame implements ActionListener{
 	 */
 	public calcGui() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 600, 400);
+		setBounds(100, 100, 700, 400);
 		contentPane = new JPanel();
 		contentPane.setForeground(new Color(0, 0, 0));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -173,6 +175,9 @@ public class calcGui extends JFrame implements ActionListener{
 		button_20 = new JButton("Redo");
 		button_20.setBounds(10, 230, 110, 20);
 		contentPane.add(button_20);
+		
+		statLabel=ConcreteNodeProxy.getStatisticsLabel();
+		contentPane.add(statLabel);
 
 		// add event listeners
 		button_0.addActionListener( this );
@@ -209,7 +214,8 @@ public class calcGui extends JFrame implements ActionListener{
 		result=Integer.toString(expression.Interpret());   		 // e.g.: (10 - 2) + 3 = 11
 		label.setText(result);
 
-		if(labelStack.size()!=0){								 //erase the previous graph labels
+		//erase the previous graph labels
+		if(labelStack.size()!=0){								 
 			for(JLabel labels: labelStack){
 				contentPane.remove(labels);
 			}
@@ -217,17 +223,20 @@ public class calcGui extends JFrame implements ActionListener{
 
 		//Build tree graph
 		ImageContext image =new ImageContext();
-
 		for(ConcreteNode cnode: cNode){
 			JLabel label=cnode.drawNode(image);
 			contentPane.add(label);
 			labelStack.push(label);
 		}
 		ConcreteNode.reSetXY();
+		
+		//Set statistics label
+		statLabel.setText(ConcreteNodeProxy.getValue());
+		ConcreteNodeProxy.setValueToZero();
+	
 		repaint();
 		
 		result="";
-		System.out.println("Result: "+result);	
 	}
 	
 	@Override

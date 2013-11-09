@@ -5,6 +5,5 @@ import javax.swing.JLabel;
 //Flyweight
 public interface INode {
 	
-	public JLabel drawNode(ImageContext image);
-	
+	public JLabel drawNode(ImageContext image);	
 }
