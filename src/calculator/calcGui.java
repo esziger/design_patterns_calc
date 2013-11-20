@@ -46,10 +46,16 @@ public class calcGui extends JFrame implements ActionListener{
 	private JButton button_18;
 	private JButton button_19;
 	private JButton button_20;
+	private JButton btnPreorder;
+	private JButton btnInorder;
+	private JButton btnPostorder;
 
 	private String result="";
 	
-	Stack<JLabel> labelStack = new Stack<JLabel>();	//helper stack for removing labels
+	private IExpression expression;
+
+	Stack<ConcreteNode> cNodeLabel;
+	private Stack<ConcreteNode> cOldNode = new Stack<ConcreteNode>(); //helper stack for removing old node labels
 		
 	private MementoCareTaker mCareTaker = new MementoCareTaker();
 	private RedoUndoActor actor = new RedoUndoActor(mCareTaker);
@@ -165,7 +171,7 @@ public class calcGui extends JFrame implements ActionListener{
 		contentPane.add(button_17);
 
 		button_18 = new JButton("1/^");
-		button_18.setBounds(200, 200, 60, 20);
+		button_18.setBounds(200, 200, 50, 20);
 		contentPane.add(button_18);
 		
 		button_19 = new JButton("Undo");
@@ -178,6 +184,18 @@ public class calcGui extends JFrame implements ActionListener{
 		
 		statLabel=ConcreteNodeProxy.getStatisticsLabel();
 		contentPane.add(statLabel);
+		
+		btnPreorder = new JButton("PreOrder");
+		btnPreorder.setBounds(10, 261, 110, 23);
+		contentPane.add(btnPreorder);
+		
+		btnInorder = new JButton("InOrder");
+		btnInorder.setBounds(130, 231, 120, 23);
+		contentPane.add(btnInorder);
+		
+		btnPostorder = new JButton("PostOrder");
+		btnPostorder.setBounds(130, 261, 120, 23);
+		contentPane.add(btnPostorder);
 
 		// add event listeners
 		button_0.addActionListener( this );
@@ -201,32 +219,34 @@ public class calcGui extends JFrame implements ActionListener{
 		button_18.addActionListener( this );
 		button_19.addActionListener( this );
 		button_20.addActionListener( this );
+		btnPreorder.addActionListener( this );
+		btnInorder.addActionListener( this );
+		btnPostorder.addActionListener( this );
 	}
 
 	public void buildExpressionAndTree(){
 		IExpressionBuilder builder = new ConcreteBuilder();		 //Builder Pattern
 		Director dir = new Director(builder);
 
-		Stack<ConcreteNode> cNode = new Stack<ConcreteNode>();
+		cNodeLabel = new Stack<ConcreteNode>();
 
-		IExpression expression=dir.evaluate(result,cNode);		 // e.g.: IExpression expression=dir.evaluate("5 5 + 3 -");
+		expression=dir.evaluate(result,cNodeLabel);		 // e.g.: IExpression expression=dir.evaluate("5 5 + 3 -");
 
 		result=Integer.toString(expression.Interpret());   		 // e.g.: (10 - 2) + 3 = 11
 		label.setText(result);
 
 		//erase the previous graph labels
-		if(labelStack.size()!=0){								 
-			for(JLabel labels: labelStack){
-				contentPane.remove(labels);
-			}
+		for(ConcreteNode cnode: cOldNode){
+			contentPane.remove(cnode.getLabel());
 		}
-
+				
 		//Build tree graph
 		ImageContext image =new ImageContext();
-		for(ConcreteNode cnode: cNode){
-			JLabel label=cnode.drawNode(image);
-			contentPane.add(label);
-			labelStack.push(label);
+		for(ConcreteNode cnode: cNodeLabel){
+			cnode.drawNode(image,contentPane);
+			
+			//put the node into a an oldNode stack
+			cOldNode.push(cnode);
 		}
 		ConcreteNode.reSetXY();
 		
@@ -335,6 +355,25 @@ public class calcGui extends JFrame implements ActionListener{
 				result = s;
 				buildExpressionAndTree();
 			}
+		}
+		else if(e.getSource().equals(btnPreorder)){		
+			//iterate over 
+			CalcIterator iterator= expression.getIterator();
+			
+			System.out.println("\nPreorder iteration: ");
+			
+			iterator.iteratePreOrder(expression,cNodeLabel);
+		}
+		else if(e.getSource().equals(btnInorder)){
+			CalcIterator iterator= expression.getIterator();
+			
+			System.out.println("\nInorder iteration: ");
+			iterator.iterateInOrder(expression,cNodeLabel);
+		}
+		else if(e.getSource().equals(btnPostorder)){
+			CalcIterator iterator= expression.getIterator();
+			System.out.println("\nPostorder iteration: ");
+			iterator.iteratePostOrder(expression,cNodeLabel);
 		}
 
 		this.textField.setText(result);	

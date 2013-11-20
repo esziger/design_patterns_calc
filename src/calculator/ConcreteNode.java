@@ -1,7 +1,10 @@
 package calculator;
 
 import java.awt.Color;
+import java.util.Timer;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 
 public class ConcreteNode implements INode, Cloneable {
@@ -9,9 +12,14 @@ public class ConcreteNode implements INode, Cloneable {
 	private int value;
 	private String operator=null;
 	private boolean isNumber=false;
+	//each instance contains the label
+	private JLabel label=null;
 	
 	public static int x=250;
 	public static int y=250;
+	
+	Timer timer = new Timer();
+	//Timer timer;
 	
 	public ConcreteNode(){}
 	
@@ -28,27 +36,31 @@ public class ConcreteNode implements INode, Cloneable {
 	 }
 	
 	@Override
-	public JLabel drawNode(ImageContext image) {
+	public void drawNode(ImageContext image, JPanel contentPane) {
 		// TODO Auto-generated method stub
-		JLabel lbl = null;
 		if(isNumber){
 			x=x+40;
-			lbl = new JLabel(Integer.toString(value),image.getNumIcon(),JLabel.CENTER);
-			lbl.setForeground(Color.BLACK);
-			lbl.setBounds(x, y, 82, 52);
-			lbl.setVerticalTextPosition(JLabel.CENTER);
-			lbl.setHorizontalTextPosition(JLabel.CENTER);
+			label = new JLabel(Integer.toString(value),image.getNumIcon(),JLabel.CENTER);
+			label.setForeground(Color.BLACK);
+			label.setBounds(x, y, 82, 52);
+			label.setVerticalTextPosition(JLabel.CENTER);
+			label.setHorizontalTextPosition(JLabel.CENTER);
 		}
 		else{
 			x=x-20;
 			y=y-35;
-			lbl = new JLabel("("+operator+")" + " " + Integer.toString(value),image.getExpIcon(),JLabel.CENTER);
-			lbl.setForeground(Color.BLACK);
-			lbl.setBounds(x, y, 82, 52);
-			lbl.setVerticalTextPosition(JLabel.CENTER);
-			lbl.setHorizontalTextPosition(JLabel.CENTER);
+			label = new JLabel("("+operator+")" + " " + Integer.toString(value),image.getExpIcon(),JLabel.CENTER);
+			label.setForeground(Color.BLACK);
+			label.setBounds(x, y, 82, 52);
+			label.setVerticalTextPosition(JLabel.CENTER);
+			label.setHorizontalTextPosition(JLabel.CENTER);
 		}
-		return lbl;
+		//add the label to the GUI
+		contentPane.add(label);
+	}
+	
+	public JLabel getLabel(){
+		return label;
 	}
 	
 	public static void reSetXY(){
@@ -58,6 +70,10 @@ public class ConcreteNode implements INode, Cloneable {
 
 	public void setvalue(int interpretValue) {
 		value=interpretValue;
+	}
+	
+	public String getvalue() {
+		return Integer.toString(value);
 	}
 	
 	public void setOperator(String op){
@@ -70,5 +86,30 @@ public class ConcreteNode implements INode, Cloneable {
 	
 	public void setNum(){
 		isNumber=true;
+	}
+	
+	public void changeColor(){
+		
+		label.setForeground(Color.WHITE);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		SwingUtilities.invokeLater(new Runnable() {
+		
+            @Override
+            public void run() {
+	            	try {
+	    				Thread.sleep(500);
+	    			} catch (InterruptedException e) {
+	    				// TODO Auto-generated catch block
+	    				e.printStackTrace();
+	    			}
+                    label.setForeground(Color.BLACK);
+            }
+        });
 	}
 }

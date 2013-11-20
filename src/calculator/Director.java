@@ -22,8 +22,8 @@ public class Director {
 
 		for (String token : expression.split("(\\s|,)")) {
 			if  (token.equals("+")) {
-				IExpression left = expressionStack.pop();
 				IExpression right = expressionStack.pop();
+				IExpression left = expressionStack.pop();
 				
 				expr = builder.addExpression(left, right);
 				
@@ -47,8 +47,8 @@ public class Director {
 				nodeLabelStack.push(nodeLabel);		
 			}
 			else if(token.equals("*")){
-				IExpression left = expressionStack.pop();
 				IExpression right = expressionStack.pop();
+				IExpression left = expressionStack.pop();
 				
 				expr = builder.multiplyExpression(left,right);
 				

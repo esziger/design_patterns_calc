@@ -1,9 +1,9 @@
 package calculator;
 
-import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 //Flyweight
 public interface INode {
 	
-	public JLabel drawNode(ImageContext image);	
+	public void drawNode(ImageContext image, JPanel contentPane);
 }
