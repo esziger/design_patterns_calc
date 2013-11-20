@@ -8,6 +8,7 @@ public class SqrtExpression extends IExpression{
 	{
 		leftExpression = left;
 		rightExpression = right;
+		operator="1/^";
 	}
 
 	public int Interpret()
@@ -15,13 +16,7 @@ public class SqrtExpression extends IExpression{
 		return (int) Math.pow(leftExpression.Interpret(),1.0/ rightExpression.Interpret());
 	}
 
-	@Override
-	/*public String getNodeValue() {
-		return "1/^";
-	}*/
-	
 	public String getNodeValue() {
-		//return "*";
 		return Integer.toString(this.Interpret());
 	}
 }

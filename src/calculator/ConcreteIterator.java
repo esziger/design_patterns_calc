@@ -1,13 +1,9 @@
 package calculator;
 
 
-import java.util.Stack;
-
-
 public class ConcreteIterator implements CalcIterator{
 
-	public ConcreteIterator(){
-	}
+	public ConcreteIterator(){}
 
 	@Override
 	public boolean hasNext() {
@@ -15,64 +11,47 @@ public class ConcreteIterator implements CalcIterator{
 	}
 
 	@Override
-	public void next() {
-	}
+	public void next() {}
 
 	@Override
 	public String currentItem() {
 		return null;
 	}
 
-	public void iteratePreOrder(IExpression expr, Stack<ConcreteNode> cNodeLabel){
+	public void iteratePreOrder(IExpression expr){
 		if(expr == null) return;
 
 		System.out.print(expr.getNodeValue()+", ");
-		
-		for(final ConcreteNode cnode: cNodeLabel){
-			if(cnode.getvalue().equals(expr.getNodeValue())){
-				cnode.changeColor();
-			}	
-		}
-		
-
-		iteratePreOrder( expr.leftNode(), cNodeLabel );
-		iteratePreOrder( expr.rightNode(), cNodeLabel ); 
+				
+		expr.changeColor();
+	
+		iteratePreOrder( expr.getLeftNode());
+		iteratePreOrder( expr.getRightNode()); 
 	}
 
 	@Override
-	public void iterateInOrder(IExpression expr, Stack<ConcreteNode> cNodeLabel) {
+	public void iterateInOrder(IExpression expr) {
 		// TODO Auto-generated method stub
 		if(expr == null) return;
+			
+		iterateInOrder( expr.getLeftNode());
 		
-		for(final ConcreteNode cnode: cNodeLabel){
-			if(cnode.getvalue().equals(expr.getNodeValue())){
-				cnode.changeColor();
-			}	
-		}
-		
-		iterateInOrder( expr.leftNode(), cNodeLabel );
-		
+		expr.changeColor();
 		System.out.print(expr.getNodeValue()+", ");
 		
-		iterateInOrder( expr.rightNode(), cNodeLabel ); 
+		iterateInOrder( expr.getRightNode()); 
 
 	}
 
 	@Override
-	public void iteratePostOrder(IExpression expr, Stack<ConcreteNode> cNodeLabel) {
+	public void iteratePostOrder(IExpression expr) {
 		// TODO Auto-generated method stub
 		if(expr == null) return;
 		
-		for(final ConcreteNode cnode: cNodeLabel){
-			if(cnode.getvalue().equals(expr.getNodeValue())){
-				cnode.changeColor();
-			}	
-		}
+		iteratePostOrder( expr.getLeftNode() );
+		iteratePostOrder( expr.getRightNode() ); 
 		
-		iteratePostOrder( expr.leftNode(), cNodeLabel );
-		iteratePostOrder( expr.rightNode(), cNodeLabel ); 
-		
+		expr.changeColor();
 		System.out.print(expr.getNodeValue()+", ");	
 	}
-
 }

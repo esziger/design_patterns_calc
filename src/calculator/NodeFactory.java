@@ -7,7 +7,7 @@ import java.util.Map;
 //FlyweightFactory
 public class NodeFactory {
 	
-	 private Map<String, ConcreteNodeProxy> map = new HashMap<String, ConcreteNodeProxy>();
+	private Map<String, IExpressionProxy> map = new HashMap<String, IExpressionProxy>();
 	 
 	 //constructor
 	 NodeFactory(){
@@ -15,12 +15,10 @@ public class NodeFactory {
 	 }
 	
 	//gives back a clone, based on the operation type
-	public ConcreteNode getNode(String exp){
-		 ConcreteNodeProxy cNodeProxy=map.get(exp);
+	public IExpression getNode(String exp){
+		IExpressionProxy cNodeProxy=map.get(exp);
 		 
 		 if(cNodeProxy==null){
-			    cNodeProxy = new ConcreteNodeProxy();
-	            map.put(exp, cNodeProxy);
 	            System.out.println("We should not enter here, it means there is a new operation..");
 		 }
 		 return cNodeProxy.clone();
@@ -29,33 +27,25 @@ public class NodeFactory {
 	//loads the Map with prototypes
 	public void loadCache(){
 		 
-		ConcreteNodeProxy cNodePlus = new ConcreteNodeProxy();
-		cNodePlus.setOperator("+");
+		IExpressionProxy cNodePlus = new IExpressionProxy("+");
 		map.put("+",cNodePlus);
 		
-		ConcreteNodeProxy cNodeMinus = new ConcreteNodeProxy();
-		cNodeMinus.setOperator("-");
+		IExpressionProxy cNodeMinus = new IExpressionProxy("-");
 		map.put("-",cNodeMinus);
 		
-		ConcreteNodeProxy cNodeMulti = new ConcreteNodeProxy();
-		cNodeMulti.setOperator("*");
+		IExpressionProxy cNodeMulti = new IExpressionProxy("*");
 		map.put("*",cNodeMulti);
 		
-		ConcreteNodeProxy cNodeDiv = new ConcreteNodeProxy();
-		cNodeDiv.setOperator("\\");
+		IExpressionProxy cNodeDiv = new IExpressionProxy("\\");
 		map.put("\\",cNodeDiv);
 		
-		ConcreteNodeProxy cNodeRoot = new ConcreteNodeProxy();
-		cNodeRoot.setOperator("1/^");
+		IExpressionProxy cNodeRoot = new IExpressionProxy("1/^");
 		map.put("1/^",cNodeRoot);
 		
-		ConcreteNodeProxy cNodeSqrt = new ConcreteNodeProxy();
-		cNodeSqrt.setOperator("^");
+		IExpressionProxy cNodeSqrt = new IExpressionProxy("^");
 		map.put("^",cNodeSqrt);
 		
-		ConcreteNodeProxy cNodeNum = new ConcreteNodeProxy();
-		cNodeNum.setOperator("num");
-		cNodeNum.setNum();
+		IExpressionProxy cNodeNum = new IExpressionProxy("num");
 		map.put("num",cNodeNum);
 	 }
 }

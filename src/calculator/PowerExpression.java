@@ -8,21 +8,15 @@ public class PowerExpression extends IExpression{
 	{
 		leftExpression = left;
 		rightExpression = right;
+		operator="^";
 	}
 
 	public int Interpret()
 	{
 		return (int) Math.pow(leftExpression.Interpret(),rightExpression.Interpret());
 	}
-
-	@Override
-	/*public String getNodeValue() {
-		// TODO Auto-generated method stub
-		return "^";
-	}*/
 	
 	public String getNodeValue() {
-		//return "*";
 		return Integer.toString(this.Interpret());
 	}
 }

@@ -10,55 +10,52 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
-import java.util.Stack;
 
 /**
  * The calculator works with RPN/Peverse polish notation
  * This means the calculator accepts commands in POSTFIX notation e.g.: 5,4 +  OR e.g: 67 90 * 15 +
  * Because of the postfix notation We don't need parenthesis
  */
-public class calcGui extends JFrame implements ActionListener{
+public class CalcGui extends JFrame implements ActionListener{
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	private JTextField textField;
-	private JLabel label;
-	private JLabel statLabel;
+	private JPanel 		contentPane;
+	private JTextField 	textField;
+	private JLabel 		label;
+	private JLabel 		statLabel;
+	private JButton 	button_0;	
+	private JButton 	button_1;
+	private JButton 	button_2;
+	private JButton 	button_3;
+	private JButton 	button_4;
+	private JButton 	button_5;
+	private JButton 	button_6;
+	private JButton 	button_7;
+	private JButton 	button_8;
+	private JButton 	button_9;
+	private JButton 	button_10;
+	private JButton 	button_11;
+	private JButton 	button_12;
+	private JButton 	button_13;
+	private JButton 	button_14;
+	private JButton 	button_15;
+	private JButton 	button_16;
+	private JButton 	button_17;
+	private JButton 	button_18;
+	private JButton 	button_19;
+	private JButton 	button_20;
+	private JButton		btnPreorder;
+	private JButton 	btnInorder;
+	private JButton 	btnPostorder;
+	private JButton 	btnLeftalign;
+	private JButton 	btnRightalign;
+	private JButton 	btnCenteralign;
 	
-	private JButton button_0;	//evaluate
-	private JButton button_1;
-	private JButton button_2;
-	private JButton button_3;
-	private JButton button_4;
-	private JButton button_5;
-	private JButton button_6;
-	private JButton button_7;
-	private JButton button_8;
-	private JButton button_9;
-	private JButton button_10;
-	private JButton button_11;
-	private JButton button_12;
-	private JButton button_13;
-	private JButton button_14;
-	private JButton button_15;
-	private JButton button_16;
-	private JButton button_17;
-	private JButton button_18;
-	private JButton button_19;
-	private JButton button_20;
-	private JButton btnPreorder;
-	private JButton btnInorder;
-	private JButton btnPostorder;
-
-	private String result="";
-	
-	private IExpression expression;
-
-	Stack<ConcreteNode> cNodeLabel;
-	private Stack<ConcreteNode> cOldNode = new Stack<ConcreteNode>(); //helper stack for removing old node labels
-		
-	private MementoCareTaker mCareTaker = new MementoCareTaker();
-	private RedoUndoActor actor = new RedoUndoActor(mCareTaker);
+	private String 				result="";
+	private IExpression 		expression;
+	private IExpression 		oldExpression	= null;	//helper for deleting previous labels
+	private MementoCareTaker 	mCareTaker		= new MementoCareTaker();
+	private RedoUndoActor 		actor			= new RedoUndoActor(mCareTaker);
 	
 	/**
 	 * Launch the application.
@@ -68,7 +65,7 @@ public class calcGui extends JFrame implements ActionListener{
 			@Override
 			public void run() {
 				try {
-					calcGui frame = new calcGui();
+					CalcGui frame = new CalcGui();
 					frame.setVisible(true);				
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -80,9 +77,9 @@ public class calcGui extends JFrame implements ActionListener{
 	/**
 	 * Create the frame.
 	 */
-	public calcGui() {
+	public CalcGui() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 700, 400);
+		setBounds(100, 100, 700, 450);
 		contentPane = new JPanel();
 		contentPane.setForeground(new Color(0, 0, 0));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -182,7 +179,7 @@ public class calcGui extends JFrame implements ActionListener{
 		button_20.setBounds(10, 230, 110, 20);
 		contentPane.add(button_20);
 		
-		statLabel=ConcreteNodeProxy.getStatisticsLabel();
+		statLabel=IExpressionProxy.getStatisticsLabel();
 		contentPane.add(statLabel);
 		
 		btnPreorder = new JButton("PreOrder");
@@ -196,6 +193,18 @@ public class calcGui extends JFrame implements ActionListener{
 		btnPostorder = new JButton("PostOrder");
 		btnPostorder.setBounds(130, 261, 120, 23);
 		contentPane.add(btnPostorder);
+		
+		btnLeftalign = new JButton("leftAlign");
+		btnLeftalign.setBounds(10, 298, 110, 23);
+		contentPane.add(btnLeftalign);
+		
+		btnRightalign = new JButton("rightAlign");
+		btnRightalign.setBounds(130, 298, 110, 23);
+		contentPane.add(btnRightalign);
+		
+		btnCenteralign = new JButton("centerAlign");
+		btnCenteralign.setBounds(73, 332, 110, 23);
+		contentPane.add(btnCenteralign);
 
 		// add event listeners
 		button_0.addActionListener( this );
@@ -222,37 +231,34 @@ public class calcGui extends JFrame implements ActionListener{
 		btnPreorder.addActionListener( this );
 		btnInorder.addActionListener( this );
 		btnPostorder.addActionListener( this );
+		btnLeftalign.addActionListener( this );
+		btnRightalign.addActionListener( this );
+		btnCenteralign.addActionListener( this );
 	}
 
 	public void buildExpressionAndTree(){
-		IExpressionBuilder builder = new ConcreteBuilder();		 //Builder Pattern
-		Director dir = new Director(builder);
+		Director dir = new Director();
 
-		cNodeLabel = new Stack<ConcreteNode>();
-
-		expression=dir.evaluate(result,cNodeLabel);		 // e.g.: IExpression expression=dir.evaluate("5 5 + 3 -");
+		expression=dir.evaluate(result);		 // e.g.: IExpression expression=dir.evaluate("5 5 + 3 -");
 
 		result=Integer.toString(expression.Interpret());   		 // e.g.: (10 - 2) + 3 = 11
 		label.setText(result);
 
 		//erase the previous graph labels
-		for(ConcreteNode cnode: cOldNode){
-			contentPane.remove(cnode.getLabel());
+		if(oldExpression!=null){
+			oldExpression.removeLabel(contentPane);
 		}
 				
 		//Build tree graph
 		ImageContext image =new ImageContext();
-		for(ConcreteNode cnode: cNodeLabel){
-			cnode.drawNode(image,contentPane);
-			
-			//put the node into a an oldNode stack
-			cOldNode.push(cnode);
-		}
-		ConcreteNode.reSetXY();
+		
+		expression.drawNode(400, 100, image, contentPane);
+		
+		oldExpression = expression;
 		
 		//Set statistics label
-		statLabel.setText(ConcreteNodeProxy.getValue());
-		ConcreteNodeProxy.setValueToZero();
+		statLabel.setText(IExpressionProxy.getValue());
+		IExpressionProxy.setValueToZero();
 	
 		repaint();
 		
@@ -362,18 +368,36 @@ public class calcGui extends JFrame implements ActionListener{
 			
 			System.out.println("\nPreorder iteration: ");
 			
-			iterator.iteratePreOrder(expression,cNodeLabel);
+			iterator.iteratePreOrder(expression);
 		}
 		else if(e.getSource().equals(btnInorder)){
 			CalcIterator iterator= expression.getIterator();
 			
 			System.out.println("\nInorder iteration: ");
-			iterator.iterateInOrder(expression,cNodeLabel);
+			iterator.iterateInOrder(expression);
 		}
 		else if(e.getSource().equals(btnPostorder)){
 			CalcIterator iterator= expression.getIterator();
 			System.out.println("\nPostorder iteration: ");
-			iterator.iteratePostOrder(expression,cNodeLabel);
+			iterator.iteratePostOrder(expression);
+		}
+		else if(e.getSource().equals(btnLeftalign)){			
+			AlignementContext aContext=new AlignementContext();
+			AlignementStrategy strategy=new LeftAlignementStrategy();
+			aContext.SetStrategy(strategy);
+			aContext.AligneLabels(expression,350,100);
+		}
+		else if(e.getSource().equals(btnRightalign)){
+			AlignementContext aContext=new AlignementContext();
+			AlignementStrategy strategy=new RightAlignementStrategy();
+			aContext.SetStrategy(strategy);
+			aContext.AligneLabels(expression,450,100);
+		}
+		else if(e.getSource().equals(btnCenteralign)){
+			AlignementContext aContext=new AlignementContext();
+			AlignementStrategy strategy=new CenterAlignementStrategy();
+			aContext.SetStrategy(strategy);
+			aContext.AligneLabels(expression,400,100);
 		}
 
 		this.textField.setText(result);	

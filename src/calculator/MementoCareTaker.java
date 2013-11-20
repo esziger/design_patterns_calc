@@ -10,7 +10,7 @@ public class MementoCareTaker {
 	Stack<CalculatorMemento> redoMementos = new Stack<CalculatorMemento>();	
 	
 	public void saveState(String state){
-		calculatorOriginator orig = new calculatorOriginator();
+		CalculatorOriginator orig = new CalculatorOriginator();
 		orig.SetState(state);
 		mementos.push(orig.save());
 	}

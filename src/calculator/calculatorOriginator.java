@@ -1,6 +1,6 @@
 package calculator;
 
-public class calculatorOriginator {
+public class CalculatorOriginator {
 
 	private String result;
 	

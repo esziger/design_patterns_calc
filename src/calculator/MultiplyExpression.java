@@ -6,6 +6,7 @@ public class MultiplyExpression extends IExpression{
 	{
 		leftExpression = left;
 		rightExpression = right;
+		operator="*";
 	}
 
 	public int Interpret()
@@ -15,9 +16,6 @@ public class MultiplyExpression extends IExpression{
 
 	@Override
 	public String getNodeValue() {
-		//return "*";
 		return Integer.toString(this.Interpret());
 	}
-	
-
 }

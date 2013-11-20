@@ -7,6 +7,7 @@ public class SubtractExpression extends IExpression
 	{
 		leftExpression = left;
 		rightExpression = right;
+		operator="-";
 	}
 
 	public int Interpret()
@@ -14,15 +15,7 @@ public class SubtractExpression extends IExpression
 		return leftExpression.Interpret() - rightExpression.Interpret();
 	}
 
-	@Override
-	/*public String getNodeValue() {
-		return "-";
-	}*/
-	
 	public String getNodeValue() {
-		//return "*";
 		return Integer.toString(this.Interpret());
 	}
 }
-
-//http://sourcemaking.com/design_patterns/builder/java/2
